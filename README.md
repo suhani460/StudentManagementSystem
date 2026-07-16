@@ -4,7 +4,7 @@ A Java-based Student Management System developed using JDBC and MySQL. This proj
 
 ---
 
-## Features
+## Features 
 
 - Add Student
 - View All Students
