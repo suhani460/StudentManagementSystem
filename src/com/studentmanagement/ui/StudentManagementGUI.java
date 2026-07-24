@@ -20,11 +20,12 @@ public class StudentManagementGUI extends JFrame {
 
     private JTable table;
     private DefaultTableModel model;
+    private JLabel totalStudentsLabel;
 
     public StudentManagementGUI() {
 
         setTitle("Student Management System");
-        setSize(1000,700);
+        setSize(1120,760);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
@@ -41,11 +42,7 @@ public class StudentManagementGUI extends JFrame {
         title.setForeground(new Color(25,60,120));
         add(title);
 
-        JLabel subtitle = new JLabel("Student Database Dashboard");
-        subtitle.setBounds(330,55,300,25);
-        subtitle.setFont(new Font("Segoe UI",Font.PLAIN,16));
-        subtitle.setForeground(Color.GRAY);
-        add(subtitle);
+
 
         // ===========================
         // LABELS
@@ -189,6 +186,7 @@ public class StudentManagementGUI extends JFrame {
 
         table = new JTable(model);
 
+
         table.setRowHeight(28);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 
@@ -201,9 +199,46 @@ public class StudentManagementGUI extends JFrame {
         table.getTableHeader().setForeground(Color.WHITE);
 
         table.setGridColor(Color.LIGHT_GRAY);
+// ================= Dashboard Panel =================
 
+        JPanel dashboardPanel = new JPanel();
+        dashboardPanel.setLayout(null);
+        dashboardPanel.setBounds(760, 80, 300, 240);
+        dashboardPanel.setBackground(new java.awt.Color(240, 248, 255));
+        dashboardPanel.setBorder(BorderFactory.createTitledBorder("Dashboard"));
+        add(dashboardPanel);
+
+// Total Students
+        JLabel totalTitle = new JLabel("Total Students");
+        totalTitle.setBounds(220, 30, 60, 30);
+        totalTitle.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 16));
+        dashboardPanel.add(totalTitle);
+
+        totalStudentsLabel = new JLabel("0");
+        totalStudentsLabel.setBounds(200, 30, 70, 30);
+        totalStudentsLabel.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 18));
+        totalStudentsLabel.setForeground(new java.awt.Color(41, 128, 185));
+        dashboardPanel.add(totalStudentsLabel);
+
+// Current Date
+        JLabel dateLabel = new JLabel("Date:");
+        dateLabel.setBounds(20, 90, 60, 25);
+        dashboardPanel.add(dateLabel);
+
+        JLabel currentDate = new JLabel(java.time.LocalDate.now().toString());
+        currentDate.setBounds(90, 90, 180, 25);
+        dashboardPanel.add(currentDate);
+
+// Current Time
+        JLabel timeLabel = new JLabel("Time:");
+        timeLabel.setBounds(20, 130, 60, 25);
+        dashboardPanel.add(timeLabel);
+
+        JLabel currentTime = new JLabel(java.time.LocalTime.now().withNano(0).toString());
+        currentTime.setBounds(90, 130, 180, 25);
+        dashboardPanel.add(currentTime);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(20,430,940,210);
+        scrollPane.setBounds(20,430,1070,280);
         add(scrollPane);
 
         JLabel footer = new JLabel("Developed by Suhani Verma");
@@ -218,6 +253,52 @@ public class StudentManagementGUI extends JFrame {
         addButton.addActionListener(e -> {
 
             try {
+                // Validation
+
+                if (nameField.getText().trim().isEmpty() ||
+                        emailField.getText().trim().isEmpty() ||
+                        phoneField.getText().trim().isEmpty() ||
+                        courseField.getText().trim().isEmpty() ||
+                        departmentField.getText().trim().isEmpty() ||
+                        semesterField.getText().trim().isEmpty()) {
+
+                    JOptionPane.showMessageDialog(this,
+                            "All Fields are Required!");
+
+                    return;
+                }
+
+// Email Validation
+
+                if (!emailField.getText().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+
+                    JOptionPane.showMessageDialog(this,
+                            "Enter Valid Email!");
+
+                    return;
+                }
+
+// Phone Validation
+
+                if (!phoneField.getText().matches("\\d{10}")) {
+
+                    JOptionPane.showMessageDialog(this,
+                            "Phone Number Must Be 10 Digits!");
+
+                    return;
+                }
+
+// Semester Validation
+
+                int semester = Integer.parseInt(semesterField.getText());
+
+                if (semester < 1 || semester > 8) {
+
+                    JOptionPane.showMessageDialog(this,
+                            "Semester Must Be Between 1 and 8!");
+
+                    return;
+                }
 
                 Student student = new Student(
                         0,
@@ -226,7 +307,7 @@ public class StudentManagementGUI extends JFrame {
                         phoneField.getText(),
                         courseField.getText(),
                         departmentField.getText(),
-                        Integer.parseInt(semesterField.getText())
+                        semester
                 );
 
                 StudentDAO dao = new StudentDAO();
@@ -237,6 +318,7 @@ public class StudentManagementGUI extends JFrame {
                         this,
                         "Student Added Successfully!"
                 );
+
 
                 clearFields();
 
@@ -286,12 +368,18 @@ public class StudentManagementGUI extends JFrame {
         searchButton.addActionListener(e -> {
 
             try {
+                model.setRowCount(0);
 
                 int id = Integer.parseInt(idField.getText());
 
                 StudentDAO dao = new StudentDAO();
 
+
+
+
+
                 Student student = dao.searchStudent(id);
+
 
                 if (student != null) {
 
@@ -408,6 +496,7 @@ public class StudentManagementGUI extends JFrame {
             }
 
         });
+        updateDashboard();
 
         setVisible(true);
 
@@ -428,5 +517,12 @@ public class StudentManagementGUI extends JFrame {
         semesterField.setText("");
 
     }
+    private void updateDashboard() {
 
+        StudentDAO dao = new StudentDAO();
+
+        List<Student> students = dao.getAllStudents();
+
+        totalStudentsLabel.setText(String.valueOf(students.size()));
+    }
 }

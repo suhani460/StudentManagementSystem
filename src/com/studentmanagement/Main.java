@@ -155,6 +155,7 @@
 //}
 
 package com.studentmanagement;
+import com.studentmanagement.ui.LoginFrame;
 
 import com.studentmanagement.ui.StudentManagementGUI;
 
@@ -162,7 +163,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        new StudentManagementGUI();
+        new LoginFrame();
 
     }
 }

@@ -502,6 +502,40 @@ public class StudentDAO {
             }
 
         }
+    public List<Student> searchByName(String name) {
+
+        List<Student> students = new ArrayList<>();
+
+        String sql = "SELECT * FROM students WHERE name LIKE ?";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + name + "%");
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Student student = new Student();
+
+                student.setId(rs.getInt("id"));
+                student.setName(rs.getString("name"));
+                student.setEmail(rs.getString("email"));
+                student.setPhone(rs.getString("phone"));
+                student.setCourse(rs.getString("course"));
+                student.setDepartment(rs.getString("department"));
+                student.setSemester(rs.getInt("semester"));
+
+                students.add(student);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return students;
+    }
 
     }
 
